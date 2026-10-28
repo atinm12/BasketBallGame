@@ -9,6 +9,7 @@ const ctx = canvas.getContext('2d');
 let lastResult = null;   // { text, color, age } for the "MAKE" / "MISS" message
 
 function handleClick() {
+  if (!GameState.isPlaying()) return;
   const now = performance.now();
   if (Meter.isActive()) {
     resolveShot(Meter.stop(now));
@@ -21,18 +22,28 @@ function handleClick() {
 
 function resolveShot(result) {
   Player.setFrozen(false);
+  if (result.made) GameState.addPoints(result.points);
   lastResult = result.made
     ? { text: `MAKE +${result.points}`, color: '#ffd23f', age: 0 }
     : { text: 'MISS', color: '#ff5a4f', age: 0 };
 }
 
 function update(dt, now) {
-  Player.update(dt);
-  if (Meter.isActive() && Meter.isFull(now)) resolveShot(Meter.stop(now));
+  if (GameState.tick(dt)) endRound();
+  if (GameState.isPlaying()) {
+    Player.update(dt);
+    if (Meter.isActive() && Meter.isFull(now)) resolveShot(Meter.stop(now));
+  }
   if (lastResult) {
     lastResult.age += dt;
     if (lastResult.age > RESULT_SHOW_SECONDS) lastResult = null;
   }
+}
+
+// A shot whose meter is still filling at the buzzer is thrown away and scores nothing.
+function endRound() {
+  Meter.cancel();
+  Player.setFrozen(false);
 }
 
 function render(now) {
@@ -40,6 +51,7 @@ function render(now) {
   Player.draw(ctx);
   if (Meter.isActive()) Meter.draw(ctx, now, Player.position);
   if (lastResult) drawResult();
+  Ui.updateHud();
 }
 
 function drawResult() {

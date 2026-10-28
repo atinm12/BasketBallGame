@@ -38,4 +38,5 @@ const PLAYER = {
   START_Y_FT: 25,
 };
 
+const ROUND_SECONDS = 60;
 const RESULT_SHOW_SECONDS = 1.2;   // how long "MAKE" / "MISS" stays on screen
