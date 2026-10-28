@@ -111,11 +111,8 @@ canvas {
   border-radius: 4px;
   margin-right: 8px;
   color: #111;
+  background: #4fb3ff;
 }
-
-.z2 { background: #5fd17a; }
-.z3 { background: #4fb3ff; }
-.z4 { background: #ff6bd5; }
 
 .results {
   display: flex;

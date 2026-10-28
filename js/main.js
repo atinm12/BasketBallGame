@@ -40,10 +40,19 @@ function update(dt, now) {
   }
 }
 
+function startRound() {
+  GameState.startRound();
+  Player.reset();
+  Meter.cancel();
+  lastResult = null;
+  Ui.hideScreens();
+}
+
 // A shot whose meter is still filling at the buzzer is thrown away and scores nothing.
 function endRound() {
   Meter.cancel();
   Player.setFrozen(false);
+  Ui.showEndScreen();
 }
 
 function render(now) {
@@ -77,4 +86,5 @@ function frame(now) {
 }
 
 Player.attachInput(canvas, handleClick);
+Ui.onStart(startRound);
 requestAnimationFrame(frame);
