@@ -13,7 +13,8 @@ function handleClick() {
   if (Meter.isActive()) {
     resolveShot(Meter.stop(now));
   } else {
-    Meter.start(ZONES.TWO, now);
+    // The zone is fixed here, at the moment the meter starts
+    Meter.start(Court.getZone(Player.position.x, Player.position.y), now);
     Player.setFrozen(true);
   }
 }

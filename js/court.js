@@ -1,5 +1,6 @@
-// Court: converts between feet and canvas pixels and draws the top-down court
-// (floor, lines, keys, three-point arcs, and both hoops, with the far hoop dimmed).
+// Court: converts between feet and canvas pixels, draws the top-down court
+// (floor, lines, keys, three-point arcs, and both hoops, with the far hoop dimmed),
+// and decides which shot zone (2, 3, or 4 points) a spot on the floor is in.
 
 const Court = (() => {
   const S = COURT.PX_PER_FT;
@@ -12,6 +13,17 @@ const Court = (() => {
 
   const toPx = ft => COURT.MARGIN_PX + ft * S;
   const toFt = px => (px - COURT.MARGIN_PX) / S;
+
+  // Beyond half court = 4. On or outside the three-point line = 3. Otherwise 2.
+  // A spot exactly on the half-court line still counts as 3.
+  function getZone(x, y) {
+    if (x > HALF_X_FT) return ZONES.FOUR;
+    const dy = Math.abs(y - HOOP.Y_FT);
+    if (x <= CORNER_X_FT) {
+      return dy >= THREE_POINT.CORNER_DISTANCE_FT ? ZONES.THREE : ZONES.TWO;
+    }
+    return Math.hypot(x - HOOP.X_FT, dy) >= THREE_POINT.ARC_RADIUS_FT ? ZONES.THREE : ZONES.TWO;
+  }
 
   function draw(ctx) {
     ctx.fillStyle = '#23262e';
@@ -115,5 +127,5 @@ const Court = (() => {
     ctx.restore();
   }
 
-  return { width, height, toPx, toFt, draw };
+  return { width, height, toPx, toFt, getZone, draw };
 })();
